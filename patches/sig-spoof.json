@@ -1,1 +1,6 @@
+{
+  "id": "sig_spoof",
+  "name": "Signature Spoofing",
+  "description": "Enable signature spoofing permission"
+}
 
