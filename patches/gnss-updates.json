@@ -1,1 +1,6 @@
+{
+  "id": "gnss_updates",
+  "name": "GNSS Updates",
+  "description": "Disable GNSS/GPS real location updates"
+}
 
