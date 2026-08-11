@@ -1,1 +1,6 @@
+{
+  "id": "sig_verify",
+  "name": "Signature Verification Disable",
+  "description": "Disable APK signature check for system apps"
+}
 
