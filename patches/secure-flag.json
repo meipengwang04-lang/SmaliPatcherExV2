@@ -1,1 +1,6 @@
+{
+  "id": "secure_flag",
+  "name": "Secure Flag",
+  "description": "Disable secure flag for system windows"
+}
 
