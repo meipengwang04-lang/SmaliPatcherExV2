@@ -1,1 +1,6 @@
+{
+  "id": "recovery_reboot",
+  "name": "Recovery Reboot",
+  "description": "Add reboot to recovery in power menu"
+}
 
