@@ -1,40 +1,32 @@
 name: Build SmaliPatcherEx Windows EXE
 
 on:
-  push:
-    branches: [ main, master ]
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: windows-latest
+    env:
+      PUBLISH_DIR: publish
 
     steps:
-      - name: Checkout
+      - name: Checkout source
         uses: actions/checkout@v4
 
-      - name: Setup .NET 8
+      - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: 8.0.x
 
-      - name: Restore dependencies
-        run: dotnet restore SmaliPatcherEx.csproj
-
-      - name: Build self-contained EXE
+      - name: Publish project
         run: |
-          dotnet publish SmaliPatcherEx.csproj `
-            --configuration Release `
-            --runtime win-x64 `
-            --self-contained true `
-            -p:IncludeNativeLibrariesForSelfExtract=true `
-            -p:EnableCompressionInSingleFile=true `
-            -p:DebugType=embedded `
-            --output ./publish
+          dotnet publish SmaliPatcherEx.csproj -c Release -o ${{ env.PUBLISH_DIR }}
 
-      - name: Upload EXE artifact
+      - name: Copy patches to publish output
+        run: xcopy patches ${{ env.PUBLISH_DIR }}\patches\ /E /H /Y
+
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: SmaliPatcherEx-Windows-x64
-          path: ./publish/SmaliPatcherEx.exe
-          retention-days: 90
+          path: ${{ env.PUBLISH_DIR }}
