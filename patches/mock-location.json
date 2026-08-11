@@ -1,1 +1,6 @@
+{
+  "id": "mock_locations",
+  "name": "Mock Locations",
+  "description": "Hide mock location flag, apps treat mock location as real GPS"
+}
 
