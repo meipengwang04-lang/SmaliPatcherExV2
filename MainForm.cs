@@ -9,8 +9,26 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Text.Json;
+using System.Text.Json.Serialization
 
 namespace SmaliPatcherEx;
+
+using System.Text.Json.Serialization;
+
+public class Patch
+{
+    [JsonPropertyName("name")]
+    public string name { get; set; }
+    [JsonPropertyName("description")]
+    public string description { get; set; }
+    [JsonPropertyName("apiMin")]
+    public int apiMin { get; set; }
+    [JsonPropertyName("apiMax")]
+    public int apiMax { get; set; }
+    [JsonPropertyName("patches")]
+    public List<string> patches { get; set; } = new();
+}
+
 
 public partial class MainForm : Form
 {
