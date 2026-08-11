@@ -1,1 +1,6 @@
+{
+  "id": "mock_providers",
+  "name": "Mock Providers",
+  "description": "Create mock location providers without mock permission"
+}
 
