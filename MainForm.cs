@@ -8,6 +8,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Text.Json;
 
 namespace SmaliPatcherEx;
 
@@ -290,26 +291,60 @@ public partial class MainForm : Form
     }
 
     private void PopulatePatches()
-    {
-        _patchFlow.Controls.Clear();
-        _checkBoxes.Clear();
+{
+    _checkBoxes.Clear();
+    _patchFlow.Controls.Clear();
 
-        foreach (var p in PatchDefinitions.All)
+    List<Patch> patchList = new List<Patch>();
+
+    // === 可选：保留内置template，不需要就删掉下面4行 ===
+    patchList.Add(new Patch
+    {
+        name = "template",
+        description = "Template patch entry",
+        apiMin = 33,
+        apiMax = 36,
+        patches = new List<string>()
+    });
+
+    // ✅ 加载 exe同级 patches 文件夹内所有json补丁
+    string patchDir = Path.Combine(ToolDir, "patches");
+    if (Directory.Exists(patchDir))
+    {
+        foreach (var jsonFile in Directory.GetFiles(patchDir, "*.json"))
         {
-            var cb = new CheckBox
+            try
             {
-                Text = $"{p.Name} — {p.Description}",
-                Checked = true,
-                AutoSize = false,
-                Width = 840,
-                Height = 22,
-                ForeColor = System.Drawing.Color.WhiteSmoke,
-                BackColor = System.Drawing.Color.Transparent
-            };
-            _checkBoxes[p.Name] = cb;
-            _patchFlow.Controls.Add(cb);
+                string jsonText = File.ReadAllText(jsonFile, Encoding.UTF8);
+                var patchItem = JsonSerializer.Deserialize<Patch>(jsonText);
+                if (patchItem != null)
+                {
+                    patchList.Add(patchItem);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log($"Skip bad patch file {Path.GetFileName(jsonFile)}: {ex.Message}");
+            }
         }
     }
+
+    // 渲染复选框到界面
+    foreach (var p in patchList)
+    {
+        var cb = new CheckBox
+        {
+            Text = $"{p.name} — {p.description}",
+            Tag = p,
+            ForeColor = System.Drawing.Color.WhiteSmoke,
+            AutoSize = true,
+            Margin = new Padding(4)
+        };
+        _patchFlow.Controls.Add(cb);
+        _checkBoxes[p.name] = cb;
+    }
+}
+
 
     private void JarBtn_Click(object? sender, EventArgs e)
     {
