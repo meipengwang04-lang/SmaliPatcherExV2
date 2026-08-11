@@ -16,9 +16,7 @@ public partial class MainForm : Form
     private const string BAKSMALI_URL = "https://github.com/baksmali/smali/releases/download/3.0.9/baksmali-3.0.9-fat.jar";
     private const string SMALI_URL = "https://github.com/baksmali/smali/releases/download/3.0.9/smali-3.0.9-fat.jar";
 
-    private static readonly string ToolDir =
-        Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location)
-        ?? AppDomain.CurrentDomain.BaseDirectory;
+    private static readonly string ToolDir = System.AppContext.BaseDirectory;
 
     private static readonly string BaksmaliJar = Path.Combine(ToolDir, "baksmali.jar");
     private static readonly string SmaliJar = Path.Combine(ToolDir, "smali.jar");
