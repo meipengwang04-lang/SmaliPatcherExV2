@@ -1,57 +1,32 @@
 name: Build SmaliPatcherEx Windows EXE
 
 on:
-  push:
-    branches: [ main, master ]
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: windows-latest
+    env:
+      PUBLISH_DIR: publish
+
     steps:
-      - name: Checkout
+      - name: Checkout source
         uses: actions/checkout@v4
 
-      - name: Setup .NET 8
+      - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: 8.0.x
 
-      - name: Download fat JARs (no v prefix in tag)
-        shell: pwsh
+      - name: Publish project
         run: |
-          New-Item -ItemType Directory -Force -Path tools | Out-Null
-          $bak = "https://github.com/baksmali/smali/releases/download/3.0.9/baksmali-3.0.9-fat.jar"
-          $sma = "https://github.com/baksmali/smali/releases/download/3.0.9/smali-3.0.9-fat.jar"
-          Invoke-WebRequest -Uri $bak -OutFile tools/baksmali.jar -UseBasicParsing
-          Invoke-WebRequest -Uri $sma -OutFile tools/smali.jar -UseBasicParsing
-          Write-Host "baksmali: $((Get-Item tools/baksmali.jar).Length) bytes"
-          Write-Host "smali:    $((Get-Item tools/smali.jar).Length) bytes"
+          dotnet publish SmaliPatcherEx.csproj -c Release -o ${{ env.PUBLISH_DIR }}
 
-      - name: Restore
-        run: dotnet restore SmaliPatcherEx.csproj
-
-      - name: Build EXE
-        run: |
-          dotnet publish SmaliPatcherEx.csproj `
-            --configuration Release `
-            --runtime win-x64 `
-            --self-contained true `
-            -p:PublishSingleFile=true `
-            -p:IncludeNativeLibrariesForSelfExtract=true `
-            -p:EnableCompressionInSingleFile=true `
-            --output ./publish
-
-      - name: Copy JARs next to EXE
-        shell: pwsh
-        run: |
-          Copy-Item tools/baksmali.jar publish/baksmali.jar
-          Copy-Item tools/smali.jar    publish/smali.jar
-          Get-ChildItem publish/
+      - name: Copy patches to publish output
+        run: xcopy patches ${{ env.PUBLISH_DIR }}\patches\ /E /H /Y
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: SmaliPatcherEx-Windows-x64
-          path: publish/
-          retention-days: 90
+          path: ${{ env.PUBLISH_DIR }}
